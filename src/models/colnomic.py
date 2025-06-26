@@ -6,7 +6,7 @@ from PIL import Image
 from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
 
-from .embedding_class import MultimodalEmbeddingModel
+from ..base.embedding_class import MultimodalEmbeddingModel
 
 
 class Conomic(MultimodalEmbeddingModel):
@@ -19,7 +19,10 @@ class Conomic(MultimodalEmbeddingModel):
         """
         Loads the embedding model.
         """
-        if model_name not in ["nomic-ai/colnomic-embed-multimodal-3b"]:
+        if model_name not in [
+            "nomic-ai/colnomic-embed-multimodal-3b",
+            "nomic-ai/colnomic-embed-multimodal-7b",
+        ]:
             raise ValueError(f"Model {model_name} is not supported. ")
         self.device = device
         self.model = ColQwen2_5.from_pretrained(
