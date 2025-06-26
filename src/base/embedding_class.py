@@ -20,10 +20,10 @@ class MultimodalEmbeddingModel(ABC):
         """
         self.model_name = model_name
         self.device = device
-        self.model = self._load_model(model_name, device, **kwargs)
+        self._load_model(model_name, device, **kwargs)
 
     @abstractmethod
-    def _load_model(self, model_name: str, device: str, **kwargs) -> Any:
+    def _load_model(self, model_name: str, device: str, **kwargs) -> None:
         """
         Loads the embedding model.
         """
