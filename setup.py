@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 with open("requirements.txt") as f:
     requirements = f.read().splitlines()
@@ -14,4 +14,6 @@ setup(
     install_requires=[
         "git+https://github.com/illuin-tech/colpali.git",
     ],
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
 )
