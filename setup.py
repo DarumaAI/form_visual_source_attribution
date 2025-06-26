@@ -11,5 +11,7 @@ setup(
     description="Aligns multimodal embeddings with text and image inputs for visual source attribution.",
     url="https://github.com/DarumaAI/form_visual_source_attribution.git",  # Optional
     python_requires=">=3.10",  # Adjust as needed
-    install_requires=requirements,
+    install_requires=[
+        "git+https://github.com/illuin-tech/colpali.git",
+    ],
 )
