@@ -76,7 +76,7 @@ class Colnomic(MultimodalEmbeddingModel):
 
         return all_embeddings
 
-    def compute_score(self, query_embeddings, image_embeddings):
+    def compute_score(self, query_embeddings, image_embeddings) -> torch.Tensor:
         """
         Computes the similarity score between query and image embeddings.
 
@@ -87,4 +87,6 @@ class Colnomic(MultimodalEmbeddingModel):
         Returns:
             Similarity scores as a tensor.
         """
-        return self.processor.score_multi_vector(query_embeddings, image_embeddings)
+        return self.processor.score_multi_vector(
+            list(torch.unbind(query_embeddings)), list(torch.unbind(image_embeddings))
+        )
