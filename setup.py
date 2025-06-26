@@ -1,8 +1,5 @@
 from setuptools import find_packages, setup
 
-with open("requirements.txt") as f:
-    requirements = f.read().splitlines()
-
 setup(
     name="form_visual_source_attribution",  # Replace with your module/package name
     version="0.1.0",

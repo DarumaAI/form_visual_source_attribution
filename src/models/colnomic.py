@@ -1,7 +1,7 @@
 from typing import List, Union
 
 import torch
-from colpali_engine.models import ColQwen2_5, ColQwen2_5_Processor
+from colpali_engine.models import BiQwen2_5, BiQwen2_5_Processor
 from PIL import Image
 from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
@@ -25,7 +25,7 @@ class Colnomic(MultimodalEmbeddingModel):
         ]:
             raise ValueError(f"Model {model_name} is not supported. ")
         self.device = device
-        self.model = ColQwen2_5.from_pretrained(
+        self.model = BiQwen2_5.from_pretrained(
             model_name,
             torch_dtype=torch.bfloat16,
             device_map=device,  # or "mps" if on Apple Silicon
@@ -33,7 +33,7 @@ class Colnomic(MultimodalEmbeddingModel):
                 "flash_attention_2" if is_flash_attn_2_available() else None
             ),
         ).eval()
-        self.processor = ColQwen2_5_Processor.from_pretrained(model_name)
+        self.processor = BiQwen2_5_Processor.from_pretrained(model_name)
 
     def encode(
         self, inputs: List[Union[str, Image.Image]], modality: str = "text", **kwargs
@@ -50,26 +50,28 @@ class Colnomic(MultimodalEmbeddingModel):
             Embedding(s) as numpy array, tensor, or list.
         """
         batch_size = kwargs.get("batch_size", 1)
-        if modality == "text":
-            processed_inputs = self.processor.process_queries(inputs).to(
-                self.model.device
-            )
-        elif modality == "image":
-            processed_inputs = self.processor.process_images(inputs).to(
-                self.model.device
-            )
-        else:
-            raise ValueError(
-                f"Modality {modality} is not supported. Use 'text' or 'image'."
-            )
 
         all_embeddings = torch.empty(
             (0, self.model.config.hidden_size), device=self.model.device
         )
+
         with torch.no_grad():
             for i in range(0, len(inputs), batch_size):
-                batch = processed_inputs[i : i + batch_size]
-                embeddings = self.model(**batch)
+                batch_inputs = inputs[i : i + batch_size]
+                if modality == "text":
+                    processed_inputs = self.processor.process_queries(batch_inputs).to(
+                        self.model.device
+                    )
+                elif modality == "image":
+                    processed_inputs = self.processor.process_images(batch_inputs).to(
+                        self.model.device
+                    )
+                else:
+                    raise ValueError(
+                        f"Modality {modality} is not supported. Use 'text' or 'image'."
+                    )
+                embeddings = self.model(**processed_inputs)
+
                 all_embeddings = torch.cat([all_embeddings, embeddings], dim=0)
 
         return all_embeddings
