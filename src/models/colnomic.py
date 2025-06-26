@@ -9,7 +9,7 @@ from transformers.utils.import_utils import is_flash_attn_2_available
 from ..base.embedding_class import MultimodalEmbeddingModel
 
 
-class Conomic(MultimodalEmbeddingModel):
+class Colnomic(MultimodalEmbeddingModel):
     """
     General class for multimodal embedding models.
     Subclass this and implement the encode method for your specific model.
