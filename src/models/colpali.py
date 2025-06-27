@@ -50,9 +50,7 @@ class Colpali(MultimodalEmbeddingModel):
         """
         batch_size = kwargs.get("batch_size", 1)
 
-        all_embeddings = torch.empty(
-            (0, self.model.config.hidden_size), device=self.model.device
-        )
+        all_embeddings = None
 
         with torch.no_grad():
             for i in range(0, len(inputs), batch_size):
@@ -71,7 +69,10 @@ class Colpali(MultimodalEmbeddingModel):
                     )
                 embeddings = self.model(**processed_inputs)
 
-                all_embeddings = torch.cat([all_embeddings, embeddings], dim=0)
+                if all_embeddings is None:
+                    all_embeddings = embeddings
+                else:
+                    all_embeddings = torch.cat([all_embeddings, embeddings], dim=0)
 
         return all_embeddings
 
