@@ -10,5 +10,5 @@ setup(
     python_requires=">=3.10",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    install_requires=[],
+    install_requires=["colpali-engine==0.3.0"],
 )

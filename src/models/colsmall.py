@@ -1,7 +1,7 @@
 from typing import List, Union
 
 import torch
-from colpali_engine.models import ColQwen2_5, ColQwen2_5_Processor
+from colpali_engine.models import ColIdefics3, ColIdefics3Processor
 from PIL import Image
 from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
@@ -26,7 +26,7 @@ class Colnomic(MultimodalEmbeddingModel):
         ]:
             raise ValueError(f"Model {model_name} is not supported. ")
         self.device = device
-        self.model = ColQwen2_5.from_pretrained(
+        self.model = ColIdefics3.from_pretrained(
             model_name,
             torch_dtype=torch.bfloat16,
             device_map=device,  # or "mps" if on Apple Silicon
@@ -34,7 +34,7 @@ class Colnomic(MultimodalEmbeddingModel):
                 "flash_attention_2" if is_flash_attn_2_available() else None
             ),
         ).eval()
-        self.processor = ColQwen2_5_Processor.from_pretrained(model_name)
+        self.processor = ColIdefics3Processor.from_pretrained(model_name)
 
     def encode(
         self, inputs: List[Union[str, Image.Image]], modality: str = "text", **kwargs

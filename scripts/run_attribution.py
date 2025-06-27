@@ -6,7 +6,8 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 import torch
-from form_source_attribution.src.model.automodel import automodel
+import tqdm
+from form_visual_source_attribution.src.model.automodel import automodel
 from PIL import Image
 
 
@@ -247,7 +248,7 @@ def main():
         dataset_ocr = json.load(f)
 
     predictions = []  # We store all predictions in here
-    for doc_name, file_inference in llm_inference.items():
+    for doc_name, file_inference in tqdm.tqdm(llm_inference.items()):
         keyvalue_pairs = filter_keyvalue_pairs(file_inference)
 
         images_list = glob.glob(f"{img_dir}/{doc_name}__*.jpg")

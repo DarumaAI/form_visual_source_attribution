@@ -1,7 +1,7 @@
 from typing import List, Union
 
 import torch
-from colpali_engine.models import ColQwen2_5, ColQwen2_5_Processor
+from colpali_engine.models import ColPali, ColPaliProcessor
 from PIL import Image
 from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
@@ -9,7 +9,7 @@ from transformers.utils.import_utils import is_flash_attn_2_available
 from ..base.embedding_class import MultimodalEmbeddingModel
 
 
-class Colnomic(MultimodalEmbeddingModel):
+class Colpali(MultimodalEmbeddingModel):
     """
     General class for multimodal embedding models.
     Subclass this and implement the encode method for your specific model.
@@ -20,13 +20,11 @@ class Colnomic(MultimodalEmbeddingModel):
         Loads the embedding model.
         """
         if model_name not in [
-            "nomic-ai/colnomic-embed-multimodal-3b",
-            "nomic-ai/colnomic-embed-multimodal-7b",
-            "vidore/colqwen2.5-v0.2",
+            "vidore/colpali-v1.3",
         ]:
             raise ValueError(f"Model {model_name} is not supported. ")
         self.device = device
-        self.model = ColQwen2_5.from_pretrained(
+        self.model = ColPali.from_pretrained(
             model_name,
             torch_dtype=torch.bfloat16,
             device_map=device,  # or "mps" if on Apple Silicon
@@ -34,7 +32,7 @@ class Colnomic(MultimodalEmbeddingModel):
                 "flash_attention_2" if is_flash_attn_2_available() else None
             ),
         ).eval()
-        self.processor = ColQwen2_5_Processor.from_pretrained(model_name)
+        self.processor = ColPaliProcessor.from_pretrained(model_name)
 
     def encode(
         self, inputs: List[Union[str, Image.Image]], modality: str = "text", **kwargs
