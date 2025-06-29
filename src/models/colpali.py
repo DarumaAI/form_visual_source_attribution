@@ -3,7 +3,6 @@ from typing import List, Union
 import torch
 from colpali_engine.models import ColPali, ColPaliProcessor
 from PIL import Image
-from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
 
 from ..base.embedding_class import MultimodalEmbeddingModel
