@@ -75,7 +75,7 @@ class Colpali(MultimodalEmbeddingModel):
 
         return all_embeddings
 
-    def compute_score(self, query_embeddings, image_embeddings) -> torch.Tensor:
+    def compute_score(self, query_embedding, image_embeddings) -> torch.Tensor:
         """
         Computes the similarity score between query and image embeddings.
 
@@ -86,6 +86,14 @@ class Colpali(MultimodalEmbeddingModel):
         Returns:
             Similarity scores as a tensor.
         """
-        return self.processor.score_multi_vector(
-            list(torch.unbind(query_embeddings)), list(torch.unbind(image_embeddings))
-        )
+        tensors = []
+        for im_emb in image_embeddings:
+            tensors.append(
+                self.processor.score_multi_vector(
+                    query_embedding, im_emb.unsqueeze(0)
+                ).flatten()
+            )
+
+        scores = torch.cat(tensors)
+
+        return scores

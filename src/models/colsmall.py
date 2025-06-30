@@ -3,13 +3,12 @@ from typing import List, Union
 import torch
 from colpali_engine.models import ColIdefics3, ColIdefics3Processor
 from PIL import Image
-from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
 
 from ..base.embedding_class import MultimodalEmbeddingModel
 
 
-class Colnomic(MultimodalEmbeddingModel):
+class Colsmall(MultimodalEmbeddingModel):
     """
     General class for multimodal embedding models.
     Subclass this and implement the encode method for your specific model.
@@ -20,9 +19,8 @@ class Colnomic(MultimodalEmbeddingModel):
         Loads the embedding model.
         """
         if model_name not in [
-            "nomic-ai/colnomic-embed-multimodal-3b",
-            "nomic-ai/colnomic-embed-multimodal-7b",
-            "vidore/colqwen2.5-v0.2",
+            "vidore/colSmol-500M",
+            "vidore/colSmol-256M",
         ]:
             raise ValueError(f"Model {model_name} is not supported. ")
         self.device = device
@@ -78,7 +76,7 @@ class Colnomic(MultimodalEmbeddingModel):
 
         return all_embeddings
 
-    def compute_score(self, query_embeddings, image_embeddings) -> torch.Tensor:
+    def compute_score(self, query_embedding, image_embeddings) -> torch.Tensor:
         """
         Computes the similarity score between query and image embeddings.
 
@@ -89,6 +87,14 @@ class Colnomic(MultimodalEmbeddingModel):
         Returns:
             Similarity scores as a tensor.
         """
-        return self.processor.score_multi_vector(
-            list(torch.unbind(query_embeddings)), list(torch.unbind(image_embeddings))
-        )
+        tensors = []
+        for im_emb in image_embeddings:
+            tensors.append(
+                self.processor.score_multi_vector(
+                    query_embedding, im_emb.unsqueeze(0)
+                ).flatten()
+            )
+
+        scores = torch.cat(tensors)
+
+        return scores

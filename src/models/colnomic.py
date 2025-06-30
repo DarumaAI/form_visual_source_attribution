@@ -3,7 +3,6 @@ from typing import List, Union
 import torch
 from colpali_engine.models import ColQwen2_5, ColQwen2_5_Processor
 from PIL import Image
-from transformers import BatchFeature
 from transformers.utils.import_utils import is_flash_attn_2_available
 
 from ..base.embedding_class import MultimodalEmbeddingModel
@@ -78,7 +77,7 @@ class Colnomic(MultimodalEmbeddingModel):
 
         return all_embeddings
 
-    def compute_score(self, query_embeddings, image_embeddings) -> torch.Tensor:
+    def compute_score(self, query_embedding, image_embeddings) -> torch.Tensor:
         """
         Computes the similarity score between query and image embeddings.
 
@@ -89,6 +88,14 @@ class Colnomic(MultimodalEmbeddingModel):
         Returns:
             Similarity scores as a tensor.
         """
-        return self.processor.score_multi_vector(
-            list(torch.unbind(query_embeddings)), list(torch.unbind(image_embeddings))
-        )
+        tensors = []
+        for im_emb in image_embeddings:
+            tensors.append(
+                self.processor.score_multi_vector(
+                    query_embedding, im_emb.unsqueeze(0)
+                ).flatten()
+            )
+
+        scores = torch.cat(tensors)
+
+        return scores
